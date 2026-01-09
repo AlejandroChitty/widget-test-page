@@ -406,7 +406,6 @@
             }
 
             const payload = decodeJWT(token);
-            console.log('Decoded token', { payload })
 
             if (!payload) {
                 statusEl.innerHTML = `
