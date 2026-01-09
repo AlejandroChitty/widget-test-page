@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -298,6 +299,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -404,6 +406,7 @@
             }
 
             const payload = decodeJWT(token);
+            console.log('Decoded token', { token })
 
             if (!payload) {
                 statusEl.innerHTML = `
@@ -544,4 +547,5 @@
         });
     </script>
 </body>
+
 </html>
