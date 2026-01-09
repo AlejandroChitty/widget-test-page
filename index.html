@@ -357,7 +357,7 @@
             ACTION_RESPONSE: 'BM_WIDGET_ACTION_RESPONSE',
         };
 
-        let widgetId = null;
+        let widgetName = null;
         let currentScreen = null;
 
         function getTokenFromUrl() {
@@ -417,7 +417,7 @@
             }
 
             const expired = isTokenExpired(payload);
-            widgetId = payload.widgetId || payload.sub || 'unknown';
+            widgetName = payload['custom-widget-name'] || 'unknown';
             currentScreen = payload.screen || null;
 
             statusEl.innerHTML = `
@@ -426,8 +426,8 @@
                 </div>
                 <div class="info-grid" style="margin-top: 12px;">
                     <div class="info-row">
-                        <span class="label">Widget ID</span>
-                        <span class="value">${widgetId}</span>
+                        <span class="label">Widget Name</span>
+                        <span class="value">${widgetName}</span>
                     </div>
                     <div class="info-row">
                         <span class="label">Business ID</span>
@@ -504,7 +504,7 @@
         function sendAction(action, payload) {
             const message = {
                 messageType: MESSAGE_TYPES.ACTION,
-                widgetId: widgetId || 'test-widget',
+                widgetName: widgetName || 'test-widget',
                 action: action,
                 screen: currentScreen || 'CHATS',
                 payload: payload,
@@ -536,7 +536,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeToken();
-            addEventToLog('READY', { widgetId, screen: currentScreen, timestamp: new Date().toISOString() }, true);
+            addEventToLog('READY', { widgetName, screen: currentScreen, timestamp: new Date().toISOString() }, true);
         });
 
         document.addEventListener('keydown', (e) => {
