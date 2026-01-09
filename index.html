@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Widget Test Page</title>
+    <title>Widget Test Page</title>
     <style>
         :root {
             --bg-primary: #1a1a2e;
@@ -175,7 +175,6 @@
             margin-bottom: 8px;
         }
 
-        .action-group input,
         .action-group textarea {
             width: 100%;
             padding: 10px 12px;
@@ -188,7 +187,6 @@
             resize: vertical;
         }
 
-        .action-group input:focus,
         .action-group textarea:focus {
             outline: none;
             border-color: var(--accent);
@@ -226,11 +224,6 @@
 
         .btn-secondary:hover {
             border-color: var(--accent);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .events-log {
@@ -303,31 +296,16 @@
             padding: 4px 8px;
             margin-left: auto;
         }
-
-        footer {
-            text-align: center;
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Botmaker Custom Widget Test Page</h1>
-            <p>Use this page to test widget communication with the Botmaker platform</p>
+            <h1>Widget Test Page</h1>
+            <p>Test bidirectional iframe communication</p>
         </header>
 
         <div class="grid">
-            <!-- Token Status Card -->
             <div class="card">
                 <h2><span class="icon">🔐</span> Token Status</h2>
                 <div id="token-status">
@@ -335,7 +313,6 @@
                 </div>
             </div>
 
-            <!-- Screen Info Card -->
             <div class="card">
                 <h2><span class="icon">📍</span> Current Screen</h2>
                 <div id="screen-info">
@@ -344,28 +321,22 @@
             </div>
         </div>
 
-        <!-- Actions Card -->
         <div class="card" style="margin-bottom: 16px;">
-            <h2><span class="icon">⚡</span> Chat Actions</h2>
+            <h2><span class="icon">⚡</span> Actions</h2>
             <div class="actions-grid">
                 <div class="action-group">
-                    <label>Fill Chat Input</label>
-                    <textarea id="fill-input-text" rows="2" placeholder="Enter text to fill in the chat input..."></textarea>
-                    <button class="btn btn-primary" id="fill-input-btn" onclick="sendFillInput()">
-                        Fill Input
-                    </button>
+                    <label>Fill Input</label>
+                    <textarea id="fill-input-text" rows="2" placeholder="Enter text to fill in the input..."></textarea>
+                    <button class="btn btn-primary" onclick="sendFillInput()">Fill Input</button>
                 </div>
                 <div class="action-group">
-                    <label>Send Chat Message</label>
+                    <label>Send Message</label>
                     <textarea id="send-message-text" rows="2" placeholder="Enter message to send..."></textarea>
-                    <button class="btn btn-primary" id="send-message-btn" onclick="sendChatMessage()">
-                        Send Message
-                    </button>
+                    <button class="btn btn-primary" onclick="sendChatMessage()">Send Message</button>
                 </div>
             </div>
         </div>
 
-        <!-- Events Log Card -->
         <div class="card">
             <h2>
                 <span class="icon">📋</span> Events Log
@@ -375,16 +346,9 @@
                 <div class="empty-state" id="empty-events">Waiting for events...</div>
             </div>
         </div>
-
-        <footer>
-            <p>Botmaker Custom Widgets Test Page | <a href="https://botmaker.com" target="_blank">botmaker.com</a></p>
-        </footer>
     </div>
 
     <script>
-        // ============================================================
-        // Configuration
-        // ============================================================
         const MESSAGE_TYPES = {
             EVENT: 'BM_WIDGET_EVENT',
             ACTION: 'BM_WIDGET_ACTION',
@@ -394,13 +358,9 @@
         let widgetId = null;
         let currentScreen = null;
 
-        // ============================================================
-        // Token Handling
-        // ============================================================
         function getTokenFromUrl() {
             const hash = window.location.hash;
             if (!hash) return null;
-
             const params = new URLSearchParams(hash.substring(1));
             return params.get('token');
         }
@@ -408,10 +368,7 @@
         function decodeJWT(token) {
             try {
                 const parts = token.split('.');
-                if (parts.length !== 3) {
-                    throw new Error('Invalid JWT format');
-                }
-
+                if (parts.length !== 3) throw new Error('Invalid JWT format');
                 const payload = parts[1];
                 const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
                 return JSON.parse(decoded);
@@ -437,14 +394,10 @@
 
             if (!token) {
                 statusEl.innerHTML = `
-                    <div class="status-badge warning">
-                        <span class="status-dot"></span>
-                        No Token
-                    </div>
+                    <div class="status-badge warning"><span class="status-dot"></span>No Token</div>
                     <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
-                        This page should be loaded inside an iframe with a token in the URL hash.
-                        <br><br>
-                        Example: <code style="color: var(--accent);">#token=eyJ...</code>
+                        Load this page inside an iframe with a token in the URL hash.
+                        <br><br>Example: <code style="color: var(--accent);">#token=eyJ...</code>
                     </p>
                 `;
                 return;
@@ -454,10 +407,7 @@
 
             if (!payload) {
                 statusEl.innerHTML = `
-                    <div class="status-badge invalid">
-                        <span class="status-dot"></span>
-                        Invalid Token
-                    </div>
+                    <div class="status-badge invalid"><span class="status-dot"></span>Invalid Token</div>
                     <div class="token-raw" style="margin-top: 12px;">${token}</div>
                 `;
                 return;
@@ -469,8 +419,7 @@
 
             statusEl.innerHTML = `
                 <div class="status-badge ${expired ? 'invalid' : 'valid'}">
-                    <span class="status-dot"></span>
-                    ${expired ? 'Expired' : 'Valid'}
+                    <span class="status-dot"></span>${expired ? 'Expired' : 'Valid'}
                 </div>
                 <div class="info-grid" style="margin-top: 12px;">
                     <div class="info-row">
@@ -500,22 +449,15 @@
         }
 
         function updateScreenDisplay() {
-            const screenEl = document.getElementById('screen-info');
-            screenEl.innerHTML = `
+            document.getElementById('screen-info').innerHTML = `
                 <div class="screen-display">${currentScreen || 'Unknown'}</div>
             `;
         }
 
-        // ============================================================
-        // Event Handling
-        // ============================================================
         function addEventToLog(type, data, isOutgoing = false) {
             const logEl = document.getElementById('events-log');
             const emptyEl = document.getElementById('empty-events');
-
-            if (emptyEl) {
-                emptyEl.remove();
-            }
+            if (emptyEl) emptyEl.remove();
 
             const time = new Date().toLocaleTimeString();
             const eventEl = document.createElement('div');
@@ -527,41 +469,31 @@
                 </div>
                 <div class="event-payload">${JSON.stringify(data, null, 2)}</div>
             `;
-
             logEl.insertBefore(eventEl, logEl.firstChild);
         }
 
         function clearEvents() {
-            const logEl = document.getElementById('events-log');
-            logEl.innerHTML = '<div class="empty-state" id="empty-events">Waiting for events...</div>';
+            document.getElementById('events-log').innerHTML =
+                '<div class="empty-state" id="empty-events">Waiting for events...</div>';
         }
 
         function handleIncomingMessage(event) {
-            // Skip messages without data or messageType
             if (!event.data || !event.data.messageType) return;
-
             const { messageType, ...rest } = event.data;
 
-            // Handle widget events
             if (messageType === MESSAGE_TYPES.EVENT) {
                 addEventToLog(rest.event || messageType, rest);
-
-                // Update screen if provided
                 if (rest.screen && rest.screen !== currentScreen) {
                     currentScreen = rest.screen;
                     updateScreenDisplay();
                 }
             }
 
-            // Handle action responses
             if (messageType === MESSAGE_TYPES.ACTION_RESPONSE) {
                 addEventToLog('ACTION_RESPONSE', rest);
             }
         }
 
-        // ============================================================
-        // Actions
-        // ============================================================
         function generateRequestId() {
             return 'req_' + Math.random().toString(36).substring(2, 11);
         }
@@ -576,7 +508,6 @@
                 requestId: generateRequestId(),
             };
 
-            // Send to parent window
             if (window.parent !== window) {
                 window.parent.postMessage(message, '*');
                 addEventToLog(action, message, true);
@@ -587,50 +518,28 @@
 
         function sendFillInput() {
             const text = document.getElementById('fill-input-text').value;
-            if (!text.trim()) {
-                alert('Please enter some text');
-                return;
-            }
+            if (!text.trim()) { alert('Please enter some text'); return; }
             sendAction('fillInput', { text: text });
         }
 
         function sendChatMessage() {
             const text = document.getElementById('send-message-text').value;
-            if (!text.trim()) {
-                alert('Please enter a message');
-                return;
-            }
+            if (!text.trim()) { alert('Please enter a message'); return; }
             sendAction('sendMessage', { text: text });
-            // Clear the input after sending
             document.getElementById('send-message-text').value = '';
         }
 
-        // ============================================================
-        // Initialization
-        // ============================================================
         window.addEventListener('message', handleIncomingMessage);
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeToken();
-
-            // Log that we're ready
-            addEventToLog('READY', {
-                widgetId: widgetId,
-                screen: currentScreen,
-                timestamp: new Date().toISOString()
-            }, true);
+            addEventToLog('READY', { widgetId, screen: currentScreen, timestamp: new Date().toISOString() }, true);
         });
 
-        // Allow Enter key to send in textareas (Shift+Enter for new line)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
-                if (e.target.id === 'fill-input-text') {
-                    e.preventDefault();
-                    sendFillInput();
-                } else if (e.target.id === 'send-message-text') {
-                    e.preventDefault();
-                    sendChatMessage();
-                }
+                if (e.target.id === 'fill-input-text') { e.preventDefault(); sendFillInput(); }
+                else if (e.target.id === 'send-message-text') { e.preventDefault(); sendChatMessage(); }
             }
         });
     </script>
