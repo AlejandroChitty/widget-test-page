@@ -361,9 +361,7 @@
         let currentScreen = null;
 
         function getTokenFromUrl() {
-            const hash = window.location.hash;
-            if (!hash) return null;
-            const params = new URLSearchParams(hash.substring(1));
+            const params = new URLSearchParams(window.location.search);
             return params.get('bmtoken');
         }
 
@@ -398,8 +396,8 @@
                 statusEl.innerHTML = `
                     <div class="status-badge warning"><span class="status-dot"></span>No Token</div>
                     <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
-                        Load this page inside an iframe with a token in the URL hash.
-                        <br><br>Example: <code style="color: var(--accent);">#token=eyJ...</code>
+                        Load this page inside an iframe with a token in the URL query params.
+                        <br><br>Example: <code style="color: var(--accent);">?bmtoken=eyJ...</code>
                     </p>
                 `;
                 return;
